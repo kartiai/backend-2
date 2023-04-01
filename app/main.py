@@ -1,8 +1,10 @@
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from uvicorn import Config, Server
+from pydantic import BaseModel
+from typing import Annotated
 
 ##our files
 from .dependencies import get_query_token, get_token_header
@@ -10,6 +12,12 @@ from .internal import admin
 from .routers import items, users
 from .db.db import database, User, Website, Product, CartedProd
 from .test.test import add_user
+
+
+class LoginPostBody(BaseModel):
+    name: str
+    password: str
+
 
 app = FastAPI()##dependencies=[Depends(get_query_token)]
 app.mount("/frontend", StaticFiles(directory="app/frontend/static"), name="static")
@@ -36,12 +44,18 @@ async def login(request: Request):
 
 @app.get("/register", response_class=HTMLResponse)
 async def register(request: Request):
+    result = await User.objects.all()
+    print(result)
     return templates.TemplateResponse("register.html",{ "request": request })
 
 @app.get("/profile", response_class=HTMLResponse)
 async def profile(request: Request):
-    return templates.TemplateResponse("profile.html",{ "request": request })
+    return templates.TemplatesResponse("profile.html",{ "request": request })
 
+@app.post("/login")
+async def login_for_access_token(email: Annotated[str, Form()] ):
+    print(email)
+    return 0
 
 @app.on_event("startup")
 async def startup():
@@ -64,7 +78,7 @@ if __name__ == "__main__":  # pragma: no cover
             reload=True,
         ),
     )
-    
-    # do something you want before running the server 
+
+    # do something you want before running the server
     # eg. setting up custom loggers
     server.run()
