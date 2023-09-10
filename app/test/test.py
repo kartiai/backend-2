@@ -11,11 +11,6 @@ async def add_user():
     
     u1 = await User.objects.get_or_create(email="andrei@test.com", password=get_password_hash("andrei"))
     b = await User.objects.get_or_create(email="bogdan@test.com", password=get_password_hash("bogdan"))
-    ds = await User.objects.get_or_create(email="dragoS@test.com", password=get_password_hash("dragoS"))
-    da = await User.objects.get_or_create(email="drAgos@test.com", password=get_password_hash("drAgos"))
-    l = await User.objects.get_or_create(email="lucian@test.com", password=get_password_hash("lucian"))
-    r = await User.objects.get_or_create(email="robert@test.com", password=get_password_hash("robert"), token="")
-
 
     ### websites in here ###
     emag = await Website.objects.get_or_create(base_url="https://www.emag.ro/search/", name="emag", domain="www.emag.ro", category="[all]", xpath="""
