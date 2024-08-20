@@ -3,3 +3,8 @@ uvicorn[standard]
 asyncpg
 ormar
 psycopg2-binary
+pydantic-settings
+ipfshttpclient
+aiofiles
+python-multipart
+ipfs-api

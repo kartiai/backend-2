@@ -12,18 +12,35 @@ services:
       - 8000:8000
     environment:
       - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db:5432/fastapi_traefik
+      - DEBUG=True
+      - IPFS_URL=http://ipfs:5001
     depends_on:
       - db
+      - ipfs
   db:
     image: postgres:15-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - ./postgres_data:/var/lib/postgresql/data/
     expose:
       - 5432
     environment:
       - POSTGRES_USER=fastapi_traefik
       - POSTGRES_PASSWORD=fastapi_traefik
       - POSTGRES_DB=fastapi_traefik
-
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    ports:
+      - 4001:4001
+      - 5001:5001
+      - 8080:8080
+    volumes:
+      - ./ipfs_data:/var/lib/ipfs/data/
+    expose:
+      - 4001
+      - 5001
+      - 8080
+      
 volumes:
   postgres_data:
+  ipfs_data:
+

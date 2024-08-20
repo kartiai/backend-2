@@ -1,0 +1,1 @@
+docker volume inspect fastapi-docker-traefik_postgres_data

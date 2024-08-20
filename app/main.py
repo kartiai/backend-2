@@ -1,31 +1,43 @@
 from fastapi import Depends, FastAPI
 from uvicorn import Config, Server
+from typing import List, Dict
+import os
 
 from .dependencies import get_query_token, get_token_header
 from .internal import admin
-from .routers import items, users
+from .routers import items, users, upload
 
 from .db.db import database, User
+from .models.user import UserBase
 from .test.test import add_user
+import logging
 
-app = FastAPI(dependencies=[Depends(get_query_token)])
+if os.getenv('DEBUG') == "True":
+    logging.basicConfig(level=logging.DEBUG)
+app = FastAPI(##dependencies=[Depends(get_query_token)]
+)
+# postgres % curl -X POST http://0.0.0.0:8000/upload/put \
+#      -F "files=@/Users/bibinabogdan/Desktop/job/blast-indexer2/blast-builder-indexer/indexer_core/docs/postgres/data/postgres/postgresql.conf" \
+#      -H "Content-Type: multipart/form-data" \
+#      -H "API-Key: your_secret_key"
 ##https://testdriven.io/blog/fastapi-docker-traefik/
 ##https://www.fastapitutorial.com/blog/serving-html-fastapi/
 ##https://fastapi.tiangolo.com/tutorial/sql-databases/
 app.include_router(users.router)
 app.include_router(items.router)
+app.include_router(upload.router)
 app.include_router(
     admin.router,
     prefix="/admin",
     tags=["admin"],
-    dependencies=[Depends(get_token_header)],
+    #dependencies=[Depends(get_token_header)],
     responses={418: {"description": "I'm a teapot"}},
 )
 
-@app.get("/")
+@app.get("/", response_model=List[UserBase])
 async def root():
-    return await User.objects.all()
-    ##return {"message": "Hello Bigger Applications!"}
+    users = await User.objects.all()
+    return [user.dict() for user in users]
 
 @app.on_event("startup")
 async def startup():
